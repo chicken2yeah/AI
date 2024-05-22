@@ -1,40 +1,27 @@
 import streamlit as st
-import pandas as pd
-import numpy as np
+import openai
 
-st.title('Uber pickups in NYC')
+# OpenAI API 키 설정
+openai.api_key = 'YOUR_OPENAI_API_KEY'
 
-DATE_COLUMN = 'date/time'
-DATA_URL = ('https://s3-us-west-2.amazonaws.com/'
-         'streamlit-demo-data/uber-raw-data-sep14.csv.gz')
+# Streamlit 애플리케이션 제목
+st.title('ChatGPT와 대화하기')
 
-# 데이터 불러오기
-def load_data(nrows):
-    data = pd.read_csv(DATA_URL, nrows=nrows)
-    lowercase = lambda x: str(x).lower()
-    data.rename(lowercase, axis='columns', inplace=True)
-    data[DATE_COLUMN] = pd.to_datetime(data[DATE_COLUMN])
-    return data
+# 사용자 입력 받기
+user_input = st.text_input('질문을 입력하세요:')
 
-# 텍스트 요소 생성. 사용자에게 데이터가 로드 되고 있음을 알린다.
-data_load_state = st.text('Loading data...')
+# 버튼을 눌러서 응답 받기
+if st.button('전송'):
+    if user_input:
+        # OpenAI API를 사용하여 응답 생성
+        response = openai.Completion.create(
+            engine='text-davinci-003',
+            prompt=user_input,
+            max_tokens=150
+        )
 
-# 10000개의 행의 데이터를 로드한다.
-data = load_data(10000)
-
-# 데이터가 성공적으로 로드 되었음을 알린다.
-data_load_state.text('Loading data...done!')
-
-# 부제목 만들기
-st.subheader('Raw data')
-st.write(data)
-
-# 히스토그램 데이터 준비
-st.subheader('Number of pickups by hour')
-
-# 시간대별 픽업 횟수 계산
-data['hour'] = data[DATE_COLUMN].dt.hour
-hist_values = np.histogram(data['hour'], bins=24, range=(0,24))[0]
-
-# 히스토그램 표시
-st.bar_chart(hist_values)
+        # 응답 출력
+        st.write('ChatGPT의 응답:')
+        st.write(response.choices[0].text.strip())
+    else:
+        st.write('질문을 입력해주세요.')
