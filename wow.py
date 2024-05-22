@@ -3,7 +3,7 @@ import streamlit as st
 import openai
 
 # OpenAI API 키 설정
-openai.api_key = 'YOUR_OPENAI_API_KEY'
+openai.api_key = 'pip install streamlit openai'
 
 # Streamlit 애플리케이션 제목
 st.title('ChatGPT와 대화하기')
